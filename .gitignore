@@ -23,7 +23,7 @@ a.out
 # 依赖管理工具 (如 CMake, Make) 的缓存文件
 CMakeCache.txt
 CMakeFiles/
-Makefile
+# Makefile
 [Mm]akefile.Debug
 [Mm]akefile.Release
 build/
