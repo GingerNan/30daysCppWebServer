@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include <unistd.h>
+#include "util.h"
+
+int main()
+{
+    int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    errif(sockfd == -1, "socket create error");
+    
+    struct sockaddr_in serv_addr;
+    bzero(&serv_addr, sizeof serv_addr);
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serv_addr.sin_port = htons(8888);
+
+    int ret = bind(sockfd, (sockaddr*)&serv_addr, sizeof(serv_addr));
+    errif(ret == -1, "socket bind error");
+
+    ret = listen(sockfd, SOMAXCONN);
+    errif(ret == -1, "socket listen error");
+
+    struct sockaddr_in clnt_addr;
+    socklen_t clnt_addr_len = sizeof(clnt_addr);
+    bzero(&clnt_addr, sizeof clnt_addr);
+
+    int clnt_sockfd = accept(sockfd, (sockaddr*)&clnt_addr, &clnt_addr_len);
+    errif(clnt_sockfd == -1, "socket accpet error");
+    
+    printf("new client fd:%d! IP:%s Port:%d\n", clnt_sockfd, inet_ntoa(clnt_addr.sin_addr), ntohs(clnt_addr.sin_port));
+    
+    while (true)
+    {
+        // 定义缓冲区
+        char buf[1024];     
+        // 清空缓冲区
+        bzero(&buf, sizeof buf);    
+        //从客户端socket读到缓冲区，返回已读数据大小
+        ssize_t read_bytes = read(clnt_sockfd, buf, sizeof(buf));
+        if (read_bytes > 0)
+        {
+            printf("message from client fd:%d:%s\n", clnt_sockfd, buf);
+            // 将相同数据写回到客户端
+            write(clnt_sockfd, buf, sizeof buf);
+        }
+        else if (read_bytes == 0)   // read返回0，表示EOF
+        {
+            printf("client fd:%d disconnected\n", clnt_sockfd);
+            close(clnt_sockfd);
+            break;
+        }
+        else if (read_bytes == -1)  // read返回-1，表示发生错误，按照上下文方法进行错误处理
+        {
+            close(clnt_sockfd);
+            errif(true, "socket read error");
+        }
+    }
+    return 0;
+}
