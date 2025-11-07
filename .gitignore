@@ -1,0 +1,72 @@
+# ----------------------------------------
+# 1. 编译和构建输出 (C/C++)
+# ----------------------------------------
+
+# 目标文件 (Object files)
+*.o
+*.obj
+*.lo
+
+# 静态库和动态库
+*.lib
+*.a
+*.so
+*.dll
+
+# 可执行文件
+*.exe
+*.out
+*.app
+*.bin
+a.out
+
+# 依赖管理工具 (如 CMake, Make) 的缓存文件
+CMakeCache.txt
+CMakeFiles/
+Makefile
+[Mm]akefile.Debug
+[Mm]akefile.Release
+build/
+Build/
+dist/
+ipch/
+
+# ----------------------------------------
+# 2. IDE/编辑器配置 (VS Code)
+# ----------------------------------------
+
+# VS Code 配置文件目录
+# 包含用户设置、启动配置、任务配置等，通常不应共享
+.vscode/
+
+# 排除特定的 VS Code 配置文件，但保留 settings.json 和 extensions.json
+# （如果团队需要共享工作区设置和推荐扩展）
+!.vscode/settings.json
+!.vscode/extensions.json
+.vscode/*.code-workspace
+.vscode/launch.json
+.vscode/tasks.json
+.vscode/*.log
+.vscode/c_cpp_properties.json # 通常由用户本地配置，但有时需要共享基础配置
+
+# ----------------------------------------
+# 3. 操作系统和临时文件
+# ----------------------------------------
+
+# macOS 系统文件
+.DS_Store
+
+# Windows 缩略图缓存
+Thumbs.db
+ehthumbs.db
+
+# 临时文件和备份
+*~
+#*#
+
+# ----------------------------------------
+# 4. 依赖管理目录 (如果使用)
+# ----------------------------------------
+
+# 如果你使用 vcpkg (C/C++ 包管理器)
+vcpkg_installed/
