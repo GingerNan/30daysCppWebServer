@@ -10,7 +10,7 @@ Epoll::Epoll() :m_epfd(-1), m_events(nullptr)
     m_epfd = epoll_create1(0);
     errif(m_epfd == -1, "epoll create error");
     m_events = new epoll_event[MAX_EVENTS];
-    bzero(&m_events, sizeof(*m_events) * MAX_EVENTS);
+    //bzero(&m_events, sizeof(*m_events) * MAX_EVENTS);
 }
 
 Epoll::~Epoll()
