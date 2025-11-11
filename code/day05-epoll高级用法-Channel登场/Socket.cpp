@@ -45,9 +45,9 @@ void Socket::setnonblocking()
 
 int Socket::accept(InetAddress* addr)
 {
-    int clnt_sockfd = ::accept(m_fd, (sockaddr*)&addr->m_addr, &addr->m_addr_len);
-    errif(clnt_sockfd == -1, "socket accept error");
-    return clnt_sockfd;
+    int client_sockfd = ::accept(m_fd, (sockaddr*)&addr->m_addr, &addr->m_addr_len);
+    errif(client_sockfd == -1, "socket accept error");
+    return client_sockfd;
 }
 
 int Socket::getFd()

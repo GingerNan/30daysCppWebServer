@@ -37,7 +37,7 @@ int main()
             if (chfd == serv_sock->getFd())
             {
                 // 新客户端连接
-                InetAddress* client_addr = new InetAddress();                     // 会发生内存泄露！没有delete
+                InetAddress* client_addr = new InetAddress();                       // 会发生内存泄露！没有delete
                 Socket* client_sock = new Socket(serv_sock->accept(client_addr));   // 会发生内存泄露！没有delete
                 printf("new client fd=%d! %s Port:%d\n", 
                     client_sock->getFd(),
@@ -47,6 +47,7 @@ int main()
 
                 client_sock->setnonblocking();
                 Channel* clientChannel = new Channel(ep, client_sock->getFd());
+                clientChannel->enbleReading();
             }
             else if (activeChannels[i]->getRevents() & EPOLLIN)
             {
