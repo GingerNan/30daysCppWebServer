@@ -17,7 +17,7 @@ public:
     bool getInEpoll();
     void setInEpoll();
 
-    void setRevents();
+    void setRevents(uint32_t);
 private:
     Epoll*  m_ep;
     int m_fd;

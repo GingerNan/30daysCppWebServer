@@ -1,12 +1,14 @@
+#include "util.h"
+#include "Epoll.h"
+#include "Socket.h"
+#include "InetAddress.h"
+#include "Channel.h"
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
 #include <vector>
-#include "util.h"
-#include "Epoll.h"
-#include "Socket.h"
-#include "InetAddress.h"
+
 
 #define READ_BUFFER 1024
 
@@ -21,29 +23,35 @@ int main()
 
     Epoll* ep = new Epoll();
     serv_sock->setnonblocking();
-    ep->addFd(serv_sock->getFd(), EPOLLIN | EPOLLET);
+
+    Channel* serverChannel = new Channel(ep, serv_sock->getFd());
+    serverChannel->enbleReading();
 
     while (true)
     {
-        std::vector<epoll_event> events = ep->poll();
-        int nfds = events.size();
-        for (int i = 0; i < events.size(); ++i)
+        std::vector<Channel*> activeChannels = ep->poll();
+        int nfds = activeChannels.size();
+        for (int i = 0; i < nfds; i++)
         {
-            if (events[i].data.fd == serv_sock->getFd())    //新客戶端连接
+            int chfd = activeChannels[i]->getFd();
+            if (chfd == serv_sock->getFd())
             {
-                InetAddress* clnt_addr = new InetAddress(); //会发生内存泄露，没有delete
-                Socket* clnt_sock = new Socket(serv_sock->accept(clnt_addr));   //会发生内存泄露，没有delete
-                printf("new client fd %d! IP:%s Port:%d\n", 
-                        clnt_sock->getFd(), 
-                        inet_ntoa(clnt_addr->m_addr.sin_addr), 
-                        ntohs(clnt_addr->m_addr.sin_port));
+                // 新客户端连接
+                InetAddress* client_addr = new InetAddress();                     // 会发生内存泄露！没有delete
+                Socket* client_sock = new Socket(serv_sock->accept(client_addr));   // 会发生内存泄露！没有delete
+                printf("new client fd=%d! %s Port:%d\n", 
+                    client_sock->getFd(),
+                    inet_ntoa(client_addr->m_addr.sin_addr),
+                    ntohs(client_addr->m_addr.sin_port)
+                );
 
-                clnt_sock->setnonblocking();
-                ep->addFd(clnt_sock->getFd(), EPOLLIN | EPOLLET);
+                client_sock->setnonblocking();
+                Channel* clientChannel = new Channel(ep, client_sock->getFd());
             }
-            else if (events[i].events & EPOLLIN)    // 可读事件
+            else if (activeChannels[i]->getRevents() & EPOLLIN)
             {
-                handleReadEvent(events[i].data.fd);
+                //可读事件
+                handleReadEvent(activeChannels[i]->getFd());
             }
             else
             {
@@ -51,10 +59,10 @@ int main()
             }
         }
     }
-
+    
     delete serv_addr;
     delete serv_sock;
-    
+
     return 0;
 }
 
