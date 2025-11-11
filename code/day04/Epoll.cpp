@@ -36,7 +36,6 @@ void Epoll::addFd(int fd, uint32_t op)
 std::vector<epoll_event> Epoll::poll(int timeout)
 {
     std::vector<epoll_event> active_events;
-    //TODO epoll wait error: Bad address
     int nfds = epoll_wait(m_epfd, m_events, MAX_EVENTS, timeout);
     errif(nfds == -1, "epoll wait error");
     for (int i = 0; i < nfds; ++i)
