@@ -11,6 +11,7 @@ public:
 
     void addFd(int fd, uint32_t op);
     
+    // 更新事件并到epoll红黑树上
     void updateChannel(Channel* channel);
     
     //std::vector<epoll_event> poll(int timeout = -1);
