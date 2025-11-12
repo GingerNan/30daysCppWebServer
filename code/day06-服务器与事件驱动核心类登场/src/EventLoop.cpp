@@ -7,7 +7,7 @@ EventLoop::EventLoop()
     : m_ep(nullptr),
     m_quit(false)
 {
-
+    m_ep = new Epoll();
 }
 
 EventLoop::~EventLoop()
