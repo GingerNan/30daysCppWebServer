@@ -3,13 +3,15 @@
 #include "Socket.h"
 #include "InetAddress.h"
 #include "Channel.h"
+
+#include <iostream>
     
 Acceptor::Acceptor(EventLoop* loop)
     : m_loop(loop)
 {
     m_sock = new Socket();
-    m_addr = new InetAddress("127.0.0.1", 8888);
-    m_sock->bind(m_addr);
+    InetAddress* addr = new InetAddress("127.0.0.1", 8888);
+    m_sock->bind(addr);
     m_sock->listen();
     m_sock->setnonblocking();
 
@@ -17,18 +19,26 @@ Acceptor::Acceptor(EventLoop* loop)
     std::function<void()> cb = std::bind(&Acceptor::acceptConnection, this);
     m_acceptChannel->setCallback(cb);
     m_acceptChannel->enbleReading();
+    delete addr;
 }
 
 Acceptor::~Acceptor()
 {
     delete m_sock;
-    delete m_addr;
     delete m_acceptChannel;
 }
 
 void Acceptor::acceptConnection()
 {
-    m_newConnectionCallback(m_sock);
+    InetAddress* client_addr = new InetAddress();
+    Socket* client_sock = new Socket(m_sock->accept(client_addr));
+    
+    printf("new client fd %d! IP:%s Port:%d\n", client_sock->getFd()
+        , inet_ntoa(client_addr->m_addr.sin_addr)
+        , ntohs(client_addr->m_addr.sin_port));
+
+    client_sock->setnonblocking();
+    m_newConnectionCallback(client_sock);
 }
 
 void Acceptor::setNewConnectionCallback(std::function<void(Socket*)> cb)
