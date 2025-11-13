@@ -2,7 +2,9 @@
 #include <sys/epoll.h>
 #include <functional>
 
+class Socket;
 class EventLoop;
+
 class Channel
 {
 public:
@@ -14,18 +16,26 @@ public:
 
     int getFd();
     uint32_t getEvents();
-    uint32_t getRevents();
+    uint32_t getReady();
 
     bool getInEpoll();
-    void setInEpoll();
+    void setInEpoll(bool in = true);
 
-    void setRevents(uint32_t);
-    void setCallback(std::function<void()>);
+    void useET();
+
+    void setReady(uint32_t);
+    void setReadCallback(std::function<void()>);
+    void setUseThreadPool(bool use = true);
 private:
     EventLoop* m_loop;
     int m_fd;
+
     uint32_t m_events;
-    uint32_t m_revents;
+    uint32_t m_ready;
+    
     bool m_inEpoll;
-    std::function<void()> m_callback;
+    bool m_useThreadPool;
+
+    std::function<void()> m_readCallback;
+    std::function<void()> m_writeCallback;
 };

@@ -13,10 +13,10 @@ public:
     ~Server();
 
     // 新建连接事件
-    void newConnection(Socket* serv_sock);
+    void newConnection(Socket* sock);
 
     // 删除连接事件
-    void deleteConnection(Socket* sock);
+    void deleteConnection(int sockfd);
 private:
     EventLoop* m_loop;
     Acceptor* m_acceptor;

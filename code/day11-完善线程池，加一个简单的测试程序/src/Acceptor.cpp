@@ -7,18 +7,21 @@
 #include <iostream>
     
 Acceptor::Acceptor(EventLoop* loop)
-    : m_loop(loop)
+    : m_loop(loop),
+    m_sock(nullptr),
+    m_acceptChannel(nullptr)
 {
     m_sock = new Socket();
     InetAddress* addr = new InetAddress("127.0.0.1", 8888);
     m_sock->bind(addr);
     m_sock->listen();
-    m_sock->setnonblocking();
+    //m_sock->setnonblocking();
 
     m_acceptChannel = new Channel(m_loop, m_sock->getFd());
     std::function<void()> cb = std::bind(&Acceptor::acceptConnection, this);
-    m_acceptChannel->setCallback(cb);
+    m_acceptChannel->setReadCallback(cb);
     m_acceptChannel->enbleReading();
+    m_acceptChannel->setUseThreadPool(false);
     delete addr;
 }
 
@@ -39,6 +42,7 @@ void Acceptor::acceptConnection()
 
     client_sock->setnonblocking();
     m_newConnectionCallback(client_sock);
+    delete client_addr;
 }
 
 void Acceptor::setNewConnectionCallback(std::function<void(Socket*)> cb)
