@@ -12,6 +12,8 @@ public:
     
     void listen();
 
+    void connect(InetAddress*);
+
     void setnonblocking();
 
     int accept(InetAddress*);

@@ -50,6 +50,12 @@ int Socket::accept(InetAddress* addr)
     return client_sockfd;
 }
 
+void Socket::connect(InetAddress* addr)
+{
+    int ret = ::connect(m_fd, (sockaddr*)&addr->m_addr, addr->m_addr_len);
+    errif(ret == -1, "socket connect error");
+}
+
 int Socket::getFd()
 {
     return m_fd;

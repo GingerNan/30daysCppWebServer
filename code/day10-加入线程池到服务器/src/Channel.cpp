@@ -19,7 +19,7 @@ Channel::~Channel()
 
 void Channel::handleEvent()
 {
-    m_callback();
+    m_loop->addThread(m_callback);
 }
 
 void Channel::enbleReading()
