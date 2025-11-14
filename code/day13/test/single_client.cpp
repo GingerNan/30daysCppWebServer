@@ -1,10 +1,10 @@
 #include <iostream>
 #include <unistd.h>
 #include <cstring>
-#include "src/util.h"
-#include "src/Buffer.h"
-#include "src/InetAddress.h"
-#include "src/Socket.h"
+#include "util.h"
+#include "Buffer.h"
+#include "InetAddress.h"
+#include "Socket.h"
 
 int main()
 {
