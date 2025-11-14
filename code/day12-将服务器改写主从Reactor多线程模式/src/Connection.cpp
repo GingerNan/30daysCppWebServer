@@ -15,7 +15,6 @@ Connection::Connection(EventLoop* loop, Socket* sock)
     : m_loop(loop),
     m_sock(sock),
     m_channel(nullptr),
-    m_inBuffer(new std::string()),
     m_readBuffer(nullptr)
 {
     m_channel = new Channel(loop, sock->getFd());

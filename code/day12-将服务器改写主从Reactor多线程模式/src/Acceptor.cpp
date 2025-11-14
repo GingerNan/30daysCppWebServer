@@ -28,7 +28,7 @@ Acceptor::Acceptor(EventLoop* loop)
     std::function<void()> cb = std::bind(&Acceptor::acceptConnection, this);
     m_acceptChannel->setReadCallback(cb);
     m_acceptChannel->enbleReading();
-    m_acceptChannel->setUseThreadPool(false);
+
     delete addr;
 }
 
@@ -47,7 +47,7 @@ void Acceptor::acceptConnection()
         , inet_ntoa(client_addr->m_addr.sin_addr)
         , ntohs(client_addr->m_addr.sin_port));
 
-    client_sock->setnonblocking();
+    client_sock->setnonblocking();  // 新接收到的连接设置为非阻塞模式
     m_newConnectionCallback(client_sock);
     delete client_addr;
 }
