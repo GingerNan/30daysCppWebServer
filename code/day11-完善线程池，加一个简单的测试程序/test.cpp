@@ -67,6 +67,7 @@ int main(int argc, char* argv[])
     int threads = 100;
     int msgs = 100;
     int wait = 0;
+    /*
     int o;
     const char* optstring = "t:m:w";
     while ((o == getopt(argc, argv, optstring)) != -1)
@@ -88,6 +89,7 @@ int main(int argc, char* argv[])
             break;
         }
     }
+        */
 
     ThreadPool* pool = new ThreadPool(threads);
     std::function<void()> func = std::bind(oneClient, msgs, wait);

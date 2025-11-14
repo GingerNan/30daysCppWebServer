@@ -4,7 +4,7 @@ server:
 	g++ -std=c++11 -pthread -g \
 	$(src) \
 	server.cpp \
-	-g -o server
+ 	-o server
 client:
 	g++ client.cpp src/util.cpp src/Buffer.cpp src/Socket.cpp src/InetAddress.cpp -o client
 
@@ -13,7 +13,7 @@ th:
 
 test:
 	g++ src/util.cpp src/Buffer.cpp src/Socket.cpp src/InetAddress.cpp src/ThreadPool.cpp \
-	-pthread \
+	-pthread -g \
 	test.cpp -o test
 
 clean:

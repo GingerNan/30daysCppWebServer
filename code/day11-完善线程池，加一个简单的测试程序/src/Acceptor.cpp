@@ -15,7 +15,14 @@ Acceptor::Acceptor(EventLoop* loop)
     InetAddress* addr = new InetAddress("127.0.0.1", 8888);
     m_sock->bind(addr);
     m_sock->listen();
+    /*
+        对于Acceptor，接受连接的处理事件比较短、报文数据极小，并且一般不会有特别多的新连接在
+    同一时间到达，所有Accept没有必要采用epoll ET模式，也没有必要用线程池。由于不会成为性能瓶
+    颈。
+    
+    */
     //m_sock->setnonblocking();
+    
 
     m_acceptChannel = new Channel(m_loop, m_sock->getFd());
     std::function<void()> cb = std::bind(&Acceptor::acceptConnection, this);
