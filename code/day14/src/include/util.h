@@ -1,3 +1,3 @@
 #pragma once
 
-void errif(bool, const char*);
+void ErrorIf(bool condition, const char* msg);
