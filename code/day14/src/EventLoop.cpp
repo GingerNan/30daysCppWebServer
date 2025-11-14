@@ -5,25 +5,25 @@
 #include <vector>
 
 EventLoop::EventLoop()
-    : m_ep(nullptr),
-    m_threadPool(nullptr),
-    m_quit(false)
+    : ep_(nullptr),
+    threadPool_(nullptr),
+    quit_(false)
 {
-    m_ep = new Epoll();
-    m_threadPool = new ThreadPool();
+    ep_ = new Epoll();
+    threadPool_ = new ThreadPool();
 }
 
 EventLoop::~EventLoop()
 {
-    delete m_ep;
+    delete ep_;
 }
 
 void EventLoop::loop()
 {
-    while (!m_quit)
+    while (!quit_)
     {
         std::vector<Channel*> chs;
-        chs = m_ep->poll();
+        chs = ep_->poll();
         for (auto it = chs.begin(); it != chs.end(); it++)
         {
             (*it)->handleEvent();
@@ -33,10 +33,10 @@ void EventLoop::loop()
 
 void EventLoop::updateChannel(Channel* ch)
 {
-    m_ep->updateChannel(ch);
+    ep_->updateChannel(ch);
 }
 
 void EventLoop::addThread(std::function<void()> func)
 {
-    m_threadPool->add(func);
+    threadPool_->add(func);
 }

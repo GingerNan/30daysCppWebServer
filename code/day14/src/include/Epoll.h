@@ -17,6 +17,6 @@ public:
     //std::vector<epoll_event> poll(int timeout = -1);
     std::vector<Channel*> poll(int timeout = -1);
 private:
-    int m_epfd;
-    struct epoll_event* m_events;
+    int epfd_;
+    struct epoll_event* events_;
 };

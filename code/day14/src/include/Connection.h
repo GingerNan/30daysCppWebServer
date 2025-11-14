@@ -17,9 +17,9 @@ public:
     void setDeleteConnectionCallback(std::function<void(int)>);
     void send(int sockfd);
 private:
-    EventLoop* m_loop;
-    Socket* m_sock;
-    Channel* m_channel;
-    std::function<void(int)> m_deleteConnectionCallback;
-    Buffer* m_readBuffer;
+    EventLoop* loop_;
+    Socket* sock_;
+    Channel* channel_;
+    std::function<void(int)> deleteConnectionCallback_;
+    Buffer* readBuffer_;
 };

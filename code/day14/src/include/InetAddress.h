@@ -9,6 +9,6 @@ public:
     ~InetAddress();
 
 public:
-    struct sockaddr_in m_addr;
-    socklen_t m_addr_len;
+    struct sockaddr_in addr_;
+    socklen_t addr_len_;
 };

@@ -20,5 +20,5 @@ public:
 
     int getFd();
 private:
-    int m_fd;
+    int fd_;
 };

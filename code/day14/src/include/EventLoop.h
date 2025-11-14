@@ -17,7 +17,7 @@ public:
 
     void addThread(std::function<void()>);
 private:
-    Epoll* m_ep;
-    ThreadPool* m_threadPool;
-    bool m_quit;
+    Epoll* ep_;
+    ThreadPool* threadPool_;
+    bool quit_;
 };

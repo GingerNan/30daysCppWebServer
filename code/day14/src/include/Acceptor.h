@@ -15,9 +15,9 @@ public:
 
     void setNewConnectionCallback(std::function<void(Socket*)>);
 private:
-    EventLoop* m_loop;
-    Socket* m_sock;
+    EventLoop* loop_;
+    Socket* sock_;
     //InetAddress* m_addr;
-    Channel* m_acceptChannel;
-    std::function<void(Socket*)> m_newConnectionCallback;
+    Channel* acceptChannel_;
+    std::function<void(Socket*)> newConnectionCallback_;
 };

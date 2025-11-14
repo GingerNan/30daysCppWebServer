@@ -27,15 +27,15 @@ public:
     void setReadCallback(std::function<void()>);
     void setUseThreadPool(bool use = true);
 private:
-    EventLoop* m_loop;
-    int m_fd;
+    EventLoop* loop_;
+    int fd_;
 
-    uint32_t m_events;
-    uint32_t m_ready;
+    uint32_t events_;
+    uint32_t ready_;
     
-    bool m_inEpoll;
-    bool m_useThreadPool;
+    bool inEpoll_;
+    bool useThreadPool_;
 
-    std::function<void()> m_readCallback;
-    std::function<void()> m_writeCallback;
+    std::function<void()> readCallback_;
+    std::function<void()> writeCallback_;
 };

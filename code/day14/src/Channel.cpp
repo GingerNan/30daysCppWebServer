@@ -4,92 +4,92 @@
 #include <unistd.h>
 
 Channel::Channel(EventLoop* loop, int fd)
-    : m_loop(loop),
-    m_fd(fd),
-    m_events(0),
-    m_ready(0),
-    m_inEpoll(false),
-    m_useThreadPool(true)
+    : loop_(loop),
+    fd_(fd),
+    events_(0),
+    ready_(0),
+    inEpoll_(false),
+    useThreadPool_(true)
 {
 
 }
 
 Channel::~Channel()
 {
-    if (m_fd == -1)
+    if (fd_ == -1)
     {
-        close(m_fd);
-        m_fd == -1;
+        close(fd_);
+        fd_ == -1;
     }
 }
 
 void Channel::handleEvent()
 {
-    if (m_ready & (EPOLLIN | EPOLLPRI))
+    if (ready_ & (EPOLLIN | EPOLLPRI))
     {
-        if (m_useThreadPool)
-            m_loop->addThread(m_readCallback);
+        if (useThreadPool_)
+            loop_->addThread(readCallback_);
         else
-            m_readCallback();
+            readCallback_();
     }
 
-    if (m_ready & (EPOLLOUT))
+    if (ready_ & (EPOLLOUT))
     {
-        if (m_useThreadPool)
-            m_loop->addThread(m_writeCallback);
+        if (useThreadPool_)
+            loop_->addThread(writeCallback_);
         else
-            m_writeCallback();
+            writeCallback_();
     }
 }
 
 void Channel::enbleReading()
 {
-    m_events = EPOLLIN | EPOLLET;
-    m_loop->updateChannel(this);
+    events_ = EPOLLIN | EPOLLET;
+    loop_->updateChannel(this);
 }
 
 int Channel::getFd()
 {
-    return m_fd;
+    return fd_;
 }
 
 uint32_t Channel::getEvents()
 {
-    return m_events;
+    return events_;
 }
 
 uint32_t Channel::getReady()
 {
-    return m_ready;
+    return ready_;
 }
 
 bool Channel::getInEpoll()
 {
-    return m_inEpoll;
+    return inEpoll_;
 }
 
 void Channel::setInEpoll(bool in)
 {
-    m_inEpoll = in;
+    inEpoll_ = in;
 }
 
 void Channel::setReady(uint32_t ev)
 {
-    m_ready = ev;
+    ready_ = ev;
 }
 
 void Channel::setReadCallback(std::function<void()> cb)
 {
-    m_readCallback = cb;
+    readCallback_ = cb;
 }
 
 void Channel::setUseThreadPool(bool use)
 {
-    m_useThreadPool = use;
+    useThreadPool_ = use;
 }
 
 void Channel::useET()
 {
-    m_events |= EPOLLET;
-    m_loop->updateChannel(this);
+    events_ |= EPOLLET;
+    loop_->updateChannel(this);
 }

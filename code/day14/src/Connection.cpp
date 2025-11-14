@@ -12,27 +12,27 @@
 #define READ_BUFFER 1024
 
 Connection::Connection(EventLoop* loop, Socket* sock)
-    : m_loop(loop),
-    m_sock(sock),
-    m_channel(nullptr),
-    m_readBuffer(nullptr)
+    : loop_(loop),
+    sock_(sock),
+    channel_(nullptr),
+    readBuffer_(nullptr)
 {
-    m_channel = new Channel(loop, sock->getFd());
-    m_channel->enbleReading();
-    m_channel->useET();
+    channel_ = new Channel(loop, sock->getFd());
+    channel_->enbleReading();
+    channel_->useET();
 
     std::function<void()> cb = std::bind(&Connection::echo, this, sock->getFd());
-    m_channel->setReadCallback(cb);
-    m_channel->setUseThreadPool(true);
+    channel_->setReadCallback(cb);
+    channel_->setUseThreadPool(true);
     
-    m_readBuffer = new Buffer();
+    readBuffer_ = new Buffer();
 }
 
 Connection::~Connection()
 {
-    delete m_channel;
-    delete m_sock;
-    delete m_readBuffer;
+    delete channel_;
+    delete sock_;
+    delete readBuffer_;
 }
 
 void Connection::echo(int sockfd)
@@ -45,7 +45,7 @@ void Connection::echo(int sockfd)
         ssize_t bytes_read = read(sockfd, buf, sizeof buf);
         if (bytes_read > 0)
         {
-            m_readBuffer->append(buf, bytes_read);
+            readBuffer_->append(buf, bytes_read);
         }
         else if (bytes_read == -1 && errno == EINTR)
         {
@@ -57,10 +57,10 @@ void Connection::echo(int sockfd)
         {
             // 非阻塞IO，这个条件表示数据全部读取完毕
             printf("finish reading once\n");
-            printf("message from client fd %d: %s\n", sockfd, m_readBuffer->c_str());
-            int ret = write(sockfd, m_readBuffer->c_str(), m_readBuffer->size());
+            printf("message from client fd %d: %s\n", sockfd, readBuffer_->c_str());
+            int ret = write(sockfd, readBuffer_->c_str(), readBuffer_->size());
             errif(ret == -1, "socket write error");
-            m_readBuffer->clear();
+            readBuffer_->clear();
             break;
         }
         else if (bytes_read == 0)
@@ -68,13 +68,13 @@ void Connection::echo(int sockfd)
             //EOF，客户端断开连接
             printf("EOF, client fd %d disconnected\n", sockfd);
             //close(sockfd);  //关闭socket会自动将文件描述符从epoll树上移除
-            m_deleteConnectionCallback(sockfd);     // 多线程会有bug
+            deleteConnectionCallback_(sockfd);     // 多线程会有bug
             break;
         }
         else
         {
             printf("Connection reset by peer\n");
-            m_deleteConnectionCallback(sockfd);     // 会有bug，注释后单线程无bug
+            deleteConnectionCallback_(sockfd);     // 会有bug，注释后单线程无bug
             break;
         }
     }
@@ -82,14 +82,14 @@ void Connection::echo(int sockfd)
 
 void Connection::setDeleteConnectionCallback(std::function<void(int)> cb)
 {
-    m_deleteConnectionCallback = cb;
+    deleteConnectionCallback_ = cb;
 }
 
 void Connection::send(int sockfd)
 {
-    char buf[m_readBuffer->size()];
-    strcpy(buf, m_readBuffer->c_str());
-    int data_size = m_readBuffer->size();
+    char buf[readBuffer_->size()];
+    strcpy(buf, readBuffer_->c_str());
+    int data_size = readBuffer_->size();
     int data_left = data_size;
     while (data_left > 0)
     {

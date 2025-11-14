@@ -5,20 +5,20 @@ ThreadPool::ThreadPool(int size)
 {
     for (int i = 0; i < size; ++i)
     {
-        m_threads.emplace_back(std::thread([this](){
+        threads_.emplace_back(std::thread([this](){
             while (true)
             {
                 std::function<void()> task;
                 {
-                    std::unique_lock<std::mutex> lock(m_tasks_mtx);
-                    m_cv.wait(lock, [this]()
+                    std::unique_lock<std::mutex> lock(tasks_mtx_);
+                    cv_.wait(lock, [this]()
                     {
-                        return m_stop || !m_tasks.empty();
+                        return stop_ || !tasks_.empty();
                     });
 
-                    if (m_stop && m_tasks.empty()) return;
-                    task = m_tasks.front();
-                    m_tasks.pop();
+                    if (stop_ && tasks_.empty()) return;
+                    task = tasks_.front();
+                    tasks_.pop();
                 }
                 task();
             }
@@ -29,12 +29,12 @@ ThreadPool::ThreadPool(int size)
 ThreadPool::~ThreadPool()
 {
     {
-        std::unique_lock<std::mutex> lock(m_tasks_mtx);
-        m_stop = true;
+        std::unique_lock<std::mutex> lock(tasks_mtx_);
+        stop_ = true;
     }
 
-    m_cv.notify_all();  // 唤醒所有线程，让它们退出
-    for (std::thread& th : m_threads)
+    cv_.notify_all();  // 唤醒所有线程，让它们退出
+    for (std::thread& th : threads_)
     {
         if (th.joinable()) th.join();
     }

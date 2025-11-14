@@ -20,12 +20,12 @@ public:
     // 删除连接事件
     void deleteConnection(int sockfd);
 private:
-    EventLoop* m_mainRector;
-    std::vector<EventLoop*> m_subReactors;
+    EventLoop* mainRector_;
+    std::vector<EventLoop*> subReactors_;
 
-    Acceptor* m_acceptor;
+    Acceptor* acceptor_;
     
-    std::map<int, Connection*> m_connections;
+    std::map<int, Connection*> connections_;
 
-    ThreadPool* m_threadPool;
+    ThreadPool* threadPool_;
 };

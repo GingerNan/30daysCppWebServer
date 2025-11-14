@@ -14,5 +14,5 @@ public:
     void getline();
     void setBuf(const char*);
 private:
-    std::string m_buf;
+    std::string buf_;
 };
