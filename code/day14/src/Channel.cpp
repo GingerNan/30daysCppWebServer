@@ -2,16 +2,15 @@
 #include "EventLoop.h"
 
 #include <unistd.h>
+#include <sys/epoll.h>
 
 Channel::Channel(EventLoop* loop, int fd)
     : loop_(loop),
     fd_(fd),
-    events_(0),
-    ready_(0),
-    inEpoll_(false),
-    useThreadPool_(true)
+    listen_events_(0),
+    ready_events_(0),
+    inEpoll_(false)
 {
-
 }
 
 Channel::~Channel()
@@ -19,77 +18,66 @@ Channel::~Channel()
     if (fd_ == -1)
     {
         close(fd_);
-        fd_ == -1;
+        fd_ = -1;
     }
 }
 
-void Channel::handleEvent()
+void Channel::HandleEvent()
 {
-    if (ready_ & (EPOLLIN | EPOLLPRI))
+    if (ready_events_& (EPOLLIN | EPOLLPRI))
     {
-        if (useThreadPool_)
-            loop_->addThread(readCallback_);
-        else
-            readCallback_();
+        read_callback_();
     }
 
-    if (ready_ & (EPOLLOUT))
+    if (ready_events_ & (EPOLLOUT))
     {
-        if (useThreadPool_)
-            loop_->addThread(writeCallback_);
-        else
-            writeCallback_();
+        write_callback_();
     }
 }
 
-void Channel::enbleReading()
+void Channel::EnbleReading()
 {
-    events_ = EPOLLIN | EPOLLET;
-    loop_->updateChannel(this);
+    listen_events_ = EPOLLIN | EPOLLET;
+    loop_->UpdateChannel(this);
 }
 
-int Channel::getFd()
+int Channel::GetFd()
 {
     return fd_;
 }
 
-uint32_t Channel::getEvents()
+uint32_t Channel::GetListenEvents()
 {
-    return events_;
+    return listen_events_;
 }
 
-uint32_t Channel::getReady()
+uint32_t Channel::GetReadyEvents()
 {
-    return ready_;
+    return ready_events_;
 }
 
-bool Channel::getInEpoll()
+bool Channel::GetInEpoll()
 {
     return inEpoll_;
 }
 
-void Channel::setInEpoll(bool in)
+void Channel::SetInEpoll(bool in)
 {
     inEpoll_ = in;
 }
 
-void Channel::setReady(uint32_t ev)
+void Channel::SetReadyEvents(uint32_t ev)
 {
-    ready_ = ev;
+    ready_events_ = ev;
 }
 
-void Channel::setReadCallback(std::function<void()> cb)
+void Channel::SetReadCallback(std::function<void()> const& cb)
 {
-    readCallback_ = cb;
+    read_callback_ = cb;
 }
 
-void Channel::setUseThreadPool(bool use)
+void Channel::UseET()
 {
-    useThreadPool_ = use;
-}
-
-void Channel::useET()
-{
-    events_ |= EPOLLET;
-    loop_->updateChannel(this);
+    listen_events_ |= EPOLLET;
+    loop_->UpdateChannel(this);
 }

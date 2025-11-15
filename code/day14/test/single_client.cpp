@@ -3,24 +3,23 @@
 #include <cstring>
 #include "util.h"
 #include "Buffer.h"
-#include "InetAddress.h"
 #include "Socket.h"
 
 int main()
 {
     Socket* sock = new Socket();
     InetAddress* addr = new InetAddress("127.0.0.1", 8888);
-    sock->connect(addr);
+    sock->Connect(addr);
 
-    int sockfd = sock->getFd();
+    int sockfd = sock->GetFd();
 
     Buffer* sendBuffer = new Buffer();
     Buffer* readBuffer = new Buffer();
 
     while (true)
     {
-        sendBuffer->getline();
-        ssize_t write_bytes = write(sockfd, sendBuffer->c_str(), sendBuffer->size());
+        sendBuffer->Getline();
+        ssize_t write_bytes = write(sockfd, sendBuffer->ToStr(), sendBuffer->Size());
         if (write_bytes == -1)
         {
             printf("socket already disconnected, can't write any more!\n");
@@ -36,7 +35,7 @@ int main()
 
             if (read_bytes > 0)
             {
-                readBuffer->append(buf, read_bytes);
+                readBuffer->Append(buf, read_bytes);
                 already_read += read_bytes;
             }
             else if (read_bytes == 0)  // EOF
@@ -45,13 +44,13 @@ int main()
                 exit(EXIT_SUCCESS);
             }
 
-            if (already_read >= sendBuffer->size())
+            if (already_read >= sendBuffer->Size())
             {
-                printf("message from server: %s\n", readBuffer->c_str());
+                printf("message from server: %s\n", readBuffer->ToStr());
                 break;
             }
         }
-        readBuffer->clear();
+        readBuffer->Clear();
     }
 
     delete addr;

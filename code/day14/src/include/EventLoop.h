@@ -1,4 +1,5 @@
 #pragma once
+#include "Macros.h"
 #include <functional>
 
 class Epoll;
@@ -11,11 +12,11 @@ public:
     EventLoop();
     ~EventLoop();
 
-    void loop();
-    
-    void updateChannel(Channel* ch);
+    DISALLOW_COPY_AND_MOVE(EventLoop);
 
-    void addThread(std::function<void()>);
+    void Loop();
+    
+    void UpdateChannel(Channel* ch);
 private:
     Epoll* ep_;
     ThreadPool* threadPool_;

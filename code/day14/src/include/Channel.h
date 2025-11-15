@@ -1,5 +1,6 @@
 #pragma once
-#include <sys/epoll.h>
+#include "Macros.h"
+
 #include <functional>
 
 class Socket;
@@ -11,31 +12,31 @@ public:
     Channel(EventLoop* loop, int fd);
     ~Channel();
 
-    void handleEvent();
-    void enbleReading();
+    DISALLOW_COPY_AND_MOVE(Channel);
 
-    int getFd();
-    uint32_t getEvents();
-    uint32_t getReady();
+    void HandleEvent();
+    void EnbleReading();
 
-    bool getInEpoll();
-    void setInEpoll(bool in = true);
+    int GetFd();
+    uint32_t GetListenEvents();
+    uint32_t GetReadyEvents();
 
-    void useET();
+    bool GetInEpoll();
+    void SetInEpoll(bool in = true);
 
-    void setReady(uint32_t);
-    void setReadCallback(std::function<void()>);
-    void setUseThreadPool(bool use = true);
+    void UseET();
+
+    void SetReadyEvents(uint32_t);
+    void SetReadCallback(std::function<void()> const& callback);
 private:
     EventLoop* loop_;
     int fd_;
 
-    uint32_t events_;
-    uint32_t ready_;
+    uint32_t listen_events_;
+    uint32_t ready_events_;
     
     bool inEpoll_;
-    bool useThreadPool_;
 
-    std::function<void()> readCallback_;
-    std::function<void()> writeCallback_;
+    std::function<void()> read_callback_;
+    std::function<void()> write_callback_;
 };

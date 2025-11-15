@@ -11,7 +11,7 @@ Buffer::~Buffer()
 
 }
 
-void Buffer::append(const char* str, int size)
+void Buffer::Append(const char* str, int size)
 {
     for (int i = 0; i < size; i++)
     {
@@ -20,28 +20,28 @@ void Buffer::append(const char* str, int size)
     }
 }
 
-ssize_t Buffer::size()
+ssize_t Buffer::Size()
 {
     return buf_.size();
 }
 
-const char* Buffer::c_str()
+const char* Buffer::ToStr()
 {
     return buf_.c_str();
 }
 
-void Buffer::clear()
+void Buffer::Clear()
 {
     buf_.clear();
 }
  
-void Buffer::getline()
+void Buffer::Getline()
 {
     buf_.clear();
     std::getline(std::cin, buf_);
 }
 
-void Buffer::setBuf(const char* buf)
+void Buffer::SetBuf(const char* buf)
 {
     buf_.clear();
     buf_.append(buf);

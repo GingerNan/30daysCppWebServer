@@ -16,7 +16,7 @@ public:
 
     //void add(std::function<void()>);
     template<class F, class... Args>
-    auto add(F&& f, Args&&... args)
+    auto Add(F&& f, Args&&... args)
     -> std::future<typename std::result_of<F(Args...)>::type>;
 private:
     std::vector<std::thread> threads_;
@@ -28,7 +28,7 @@ private:
 
 // 不能放在cpp文件，原因是C++编译器不支持模板的分离编译
 template<class F, class... Args>
-auto ThreadPool::add(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type>
+auto ThreadPool::Add(F&& f, Args&&... args) -> std::future<typename std::result_of<F(Args...)>::type>
 {
     using return_type = typename std::result_of<F(Args...)>::type;
 

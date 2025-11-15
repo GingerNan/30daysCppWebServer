@@ -1,4 +1,7 @@
 #pragma once
+#include "Macros.h"
+
+#include <functional>
 #include <map>
 #include <vector>
 
@@ -14,11 +17,15 @@ public:
     Server(EventLoop* loop);
     ~Server();
 
+    DISALLOW_COPY_AND_MOVE(Server)
+
     // 新建连接事件
-    void newConnection(Socket* sock);
+    void NewConnection(Socket* sock);
 
     // 删除连接事件
-    void deleteConnection(int sockfd);
+    void DeleteConnection(Socket* sock);
+
+    void OnConnect(std::function<void(Connection*)> fn);
 private:
     EventLoop* mainRector_;
     std::vector<EventLoop*> subReactors_;
@@ -28,4 +35,6 @@ private:
     std::map<int, Connection*> connections_;
 
     ThreadPool* threadPool_;
+
+    std::function<void(Connection*)> on_connect_callback_;
 };

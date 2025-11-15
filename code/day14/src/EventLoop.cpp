@@ -18,25 +18,20 @@ EventLoop::~EventLoop()
     delete ep_;
 }
 
-void EventLoop::loop()
+void EventLoop::Loop()
 {
     while (!quit_)
     {
         std::vector<Channel*> chs;
-        chs = ep_->poll();
+        chs = ep_->Poll();
         for (auto it = chs.begin(); it != chs.end(); it++)
         {
-            (*it)->handleEvent();
+            (*it)->HandleEvent();
         }
     }   
 }
 
-void EventLoop::updateChannel(Channel* ch)
+void EventLoop::UpdateChannel(Channel* ch)
 {
-    ep_->updateChannel(ch);
-}
-
-void EventLoop::addThread(std::function<void()> func)
-{
-    threadPool_->add(func);
+    ep_->UpdateChannel(ch);
 }

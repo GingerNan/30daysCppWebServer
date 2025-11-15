@@ -56,7 +56,7 @@ private:
     Buffer* send_buffer_;
 
     std::function<void(Socket*)> delete_connection_callback_;
-    std::function<void(Connection*)> delete_connection_callback_;
+    std::function<void(Connection*)> on_connect_callback_;
 
     void ReadNonBlocking();
     void WriteNonBlocking();

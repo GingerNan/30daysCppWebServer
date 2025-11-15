@@ -5,7 +5,6 @@
 
 #include "util.h"
 #include "Buffer.h"
-#include "InetAddress.h"
 #include "Socket.h"
 #include "ThreadPool.h"
 
@@ -15,9 +14,9 @@ void oneClient(int msgs, int wait)
 {
     Socket* sock = new Socket();
     InetAddress* addr = new InetAddress("127.0.0.1", 8888);
-    sock->connect(addr);
+    sock->Connect(addr);
 
-    int sockfd = sock->getFd();
+    int sockfd = sock->GetFd();
 
     Buffer* sendBuffer = new Buffer();
     Buffer* readBuffer = new Buffer();
@@ -26,8 +25,8 @@ void oneClient(int msgs, int wait)
     int count = 0;
     while (count < msgs)
     {
-        sendBuffer->setBuf("I'm client!");
-        ssize_t write_bytes = write(sockfd, sendBuffer->c_str(), sendBuffer->size());
+        sendBuffer->SetBuf("I'm client!");
+        ssize_t write_bytes = write(sockfd, sendBuffer->ToStr(), sendBuffer->Size());
         if (write_bytes == -1)
         {
             printf("socket already disconnected, can't write any more!\n");
@@ -42,7 +41,7 @@ void oneClient(int msgs, int wait)
             ssize_t read_bytes = read(sockfd, buf, sizeof buf);
             if (read_bytes > 0)
             {
-                readBuffer->append(buf, read_bytes);
+                readBuffer->Append(buf, read_bytes);
                 already_read += read_bytes;
             }
             else if (read_bytes == 0)   // EOF
@@ -51,13 +50,13 @@ void oneClient(int msgs, int wait)
                 exit(EXIT_SUCCESS);
             }
             
-            if (already_read >= sendBuffer->size())
+            if (already_read >= sendBuffer->Size())
             {
-                printf("count: %d, message from server: %s\n", count++, readBuffer->c_str());
+                printf("count: %d, message from server: %s\n", count++, readBuffer->ToStr());
                 break;
             }
         }
-        readBuffer->clear();
+        readBuffer->Clear();
     }
     delete addr;
     delete sock;
@@ -96,7 +95,7 @@ int main(int argc, char* argv[])
     std::function<void()> func = std::bind(oneClient, msgs, wait);
     for (int i = 0; i < threads; ++i)
     {
-        pool->add(func);
+        pool->Add(func);
     }
     delete pool;
     return 0;

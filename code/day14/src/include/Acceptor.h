@@ -17,7 +17,6 @@ public:
 private:
     EventLoop* loop_;
     Socket* sock_;
-    //InetAddress* m_addr;
     Channel* acceptChannel_;
     std::function<void(Socket*)> newConnectionCallback_;
 };
