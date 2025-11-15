@@ -3,7 +3,7 @@
 #include "Socket.h"
 #include "Channel.h"
 #include "Buffer.h"
-#include "util.h"
+#include "Util.h"
 
 #include <cstring>
 #include <unistd.h>
@@ -18,8 +18,8 @@ Connection::Connection(EventLoop* loop, Socket* sock)
 {
     if (loop_ != nullptr)
     {
-        channel_ = new Channel(loop, sock->GetFd());
-        channel_->EnbleReading();
+        channel_ = new Channel(loop, sock);
+        channel_->EnbleRead();
         channel_->UseET();
     }
 
@@ -68,6 +68,13 @@ void Connection::Write()
     send_buffer_->Clear();
 }
 
+
+void Connection::Send(std::string msg)
+{
+    SetSendBuffer(msg.c_str());
+    Write();
+}
+
 void Connection::SetDeleteConnectionCallback(std::function<void(Socket*)> const& callback)
 {
     delete_connection_callback_ = callback;
@@ -76,7 +83,20 @@ void Connection::SetDeleteConnectionCallback(std::function<void(Socket*)> const&
 void Connection::SetOnConnectCallback(std::function<void(Connection*)> const& callback)
 {
     on_connect_callback_ = callback;
-    channel_->SetReadCallback([this]() { on_connect_callback_(this); });
+    //channel_->SetReadCallback([this]() { on_connect_callback_(this); });
+}
+
+void Connection::SetOnMessageCallback(std::function<void(Connection*)> const& callback)
+{
+    on_message_callback_ = callback;
+    std::function<void()> bus = std::bind(&Connection::Business, this);
+    channel_->SetReadCallback(bus);
+}
+
+void Connection::Business()
+{
+    Read();
+    on_message_callback_(this);
 }
 
 void Connection::Close()
@@ -208,7 +228,7 @@ void Connection::ReadBlocking()
     }
     else if (bytes_read == -1)
     {
-        printf("Other errnor on blocking client fd %d\n", sockfd);
+        printf("Other error on blocking client fd %d\n", sockfd);
         state_ = State::Closed;
     }
 }

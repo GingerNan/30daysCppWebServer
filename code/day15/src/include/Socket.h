@@ -7,7 +7,7 @@ class InetAddress
 public:
     InetAddress();
     InetAddress(const char* ip, uint16_t port);
-    ~InetAddress();
+    ~InetAddress() = default;
 
     DISALLOW_COPY_AND_MOVE(InetAddress);
 
@@ -23,7 +23,7 @@ class Socket
 {
 public:
     Socket();
-    Socket(int fd);
+    explicit Socket(int fd);
     ~Socket();
 
     DISALLOW_COPY_AND_MOVE(Socket);

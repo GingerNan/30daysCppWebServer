@@ -1,15 +1,7 @@
 #include "Buffer.h"
-#include "iostream"
 
-Buffer::Buffer()
-{
-
-}
-
-Buffer::~Buffer()
-{
-
-}
+#include <iostream>
+#include <cstring>
 
 void Buffer::Append(const char* str, int size)
 {

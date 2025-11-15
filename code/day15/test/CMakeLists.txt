@@ -1,6 +1,6 @@
 file(GLOB PINE_TEST_SOURCES "${PROJECT_SOURCE_DIR}/test/*.cpp")
 ######################################################################################################################
-# DEPENDENCIES
+# DEPENDENCIES 依赖项
 ######################################################################################################################
 
 ######################################################################################################################
@@ -15,7 +15,7 @@ add_custom_target(check-tests COMMAND ${CMAKE_CTEST_COMMAND} --verbose)
 
 ##########################################
 # "make server client ..."
-##########################################
+##########################################  
 foreach (pine_test_source ${PINE_TEST_SOURCES})
     # Create a human readable name.
     get_filename_component(pine_test_filename ${pine_test_source} NAME)

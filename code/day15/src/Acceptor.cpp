@@ -20,10 +20,10 @@ Acceptor::Acceptor(EventLoop* loop)
     */
     //m_sock->setnonblocking(); acceptor使用阻塞式IO比较好
 
-    acceptChannel_ = new Channel(loop_, sock_->GetFd());
+    acceptChannel_ = new Channel(loop_, sock_);
     std::function<void()> cb = std::bind(&Acceptor::acceptConnection, this);
     acceptChannel_->SetReadCallback(cb);
-    acceptChannel_->EnbleReading();
+    acceptChannel_->EnbleRead();
 
     delete addr;
 }

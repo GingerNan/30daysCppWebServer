@@ -1,11 +1,14 @@
 #pragma once
+#include "Macros.h"
 #include <string>
 
 class Buffer
 {
 public:
-    Buffer();
-    ~Buffer();
+    Buffer() = default;
+    ~Buffer() = default;
+
+    DISALLOW_COPY_AND_MOVE(Buffer);
 
     void Append(const char* str, int size);
     ssize_t Size();

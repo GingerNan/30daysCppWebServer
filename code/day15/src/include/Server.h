@@ -19,16 +19,14 @@ public:
 
     DISALLOW_COPY_AND_MOVE(Server)
 
-    // 新建连接事件
     void NewConnection(Socket* sock);
-
-    // 删除连接事件
     void DeleteConnection(Socket* sock);
-
     void OnConnect(std::function<void(Connection*)> fn);
+    void OnMessage(std::function<void(Connection*)> fn);
+    void NewConnect(std::function<void(Connection*)> fn);
 private:
-    EventLoop* mainRector_;
-    std::vector<EventLoop*> subReactors_;
+    EventLoop* main_reactor_;
+    std::vector<EventLoop*> sub_reactor_;
 
     Acceptor* acceptor_;
     
@@ -37,4 +35,6 @@ private:
     ThreadPool* threadPool_;
 
     std::function<void(Connection*)> on_connect_callback_;
+    std::function<void(Connection*)> on_message_callback_;
+    std::function<void(Connection*)> new_connect_callback_;
 };

@@ -2,7 +2,7 @@
 #include "Macros.h"
 #include <functional>
 
-class Epoll;
+class Poller;
 class Channel;
 class ThreadPool;
 
@@ -17,8 +17,9 @@ public:
     void Loop();
     
     void UpdateChannel(Channel* ch);
+    void DeleteChannel(Channel* ch);
+    void Quit();
 private:
-    Epoll* ep_;
-    ThreadPool* threadPool_;
-    bool quit_;
+    Poller* poller_{nullptr};
+    bool quit_{false};
 };

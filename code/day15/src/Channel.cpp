@@ -1,49 +1,59 @@
 #include "Channel.h"
 #include "EventLoop.h"
+#include "Socket.h"
 
 #include <unistd.h>
-#include <sys/epoll.h>
+#include <utility>
 
-Channel::Channel(EventLoop* loop, int fd)
+const int Channel::READ_EVENT = 1;
+const int Channel::WRITE_EVENT = 2;
+const int Channel::ET = 4;
+
+Channel::Channel(EventLoop* loop, Socket* socket)
     : loop_(loop),
-    fd_(fd),
-    listen_events_(0),
-    ready_events_(0),
-    inEpoll_(false)
+    socket_(socket)
 {
 }
 
 Channel::~Channel()
 {
-    if (fd_ == -1)
-    {
-        close(fd_);
-        fd_ = -1;
-    }
+    loop_->DeleteChannel(this);
 }
 
 void Channel::HandleEvent()
 {
-    if (ready_events_& (EPOLLIN | EPOLLPRI))
+    if (ready_events_& READ_EVENT)
     {
         read_callback_();
     }
 
-    if (ready_events_ & (EPOLLOUT))
+    if (ready_events_ & WRITE_EVENT)
     {
         write_callback_();
     }
 }
 
-void Channel::EnbleReading()
+void Channel::EnbleRead()
 {
-    listen_events_ = EPOLLIN | EPOLLET;
+    listen_events_ |= READ_EVENT;
     loop_->UpdateChannel(this);
 }
 
-int Channel::GetFd()
+void Channel::EnbleWrite()
 {
-    return fd_;
+    listen_events_ |= WRITE_EVENT;
+    loop_->UpdateChannel(this);
+}
+
+void Channel::UseET()
+{
+    listen_events_ |= ET;
+    loop_->UpdateChannel(this);
+}
+
+Socket* Channel::GetSocket()
+{
+    return socket_;
 }
 
 uint32_t Channel::GetListenEvents()
@@ -56,19 +66,32 @@ uint32_t Channel::GetReadyEvents()
     return ready_events_;
 }
 
-bool Channel::GetInEpoll()
+bool Channel::GetExist()
 {
-    return inEpoll_;
+    return exist_;
 }
 
-void Channel::SetInEpoll(bool in)
+void Channel::SetExist(bool in)
 {
-    inEpoll_ = in;
+    exist_ = in;
 }
 
 void Channel::SetReadyEvents(uint32_t ev)
 {
-    ready_events_ = ev;
+    if (ev & READ_EVENT)
+    {
+        ready_events_ |= READ_EVENT;
+    }
+
+    if (ev& WRITE_EVENT)
+    {
+        ready_events_ |= WRITE_EVENT;
+    }
+
+    if (ev & ET)
+    {
+        ready_events_ |= ET;
+    }
 }
 
 void Channel::SetReadCallback(std::function<void()> const& cb)
@@ -76,8 +99,7 @@ void Channel::SetReadCallback(std::function<void()> const& cb)
     read_callback_ = cb;
 }
 
-void Channel::UseET()
+void Channel::SetWriteCallback(std::function<void()> const& cb)
 {
-    listen_events_ |= EPOLLET;
-    loop_->UpdateChannel(this);
+    write_callback_ = cb;
 }

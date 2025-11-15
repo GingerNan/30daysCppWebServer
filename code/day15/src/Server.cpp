@@ -5,7 +5,8 @@
 #include "Acceptor.h"
 #include "Connection.h"
 #include "ThreadPool.h"
-#include "util.h"
+#include "Util.h"
+#include "Exception.h"
 
 #include <functional>
 #include <unistd.h>
@@ -13,10 +14,11 @@
 #define READ_BUFFER 1024
 
 Server::Server(EventLoop* loop)
-    : mainRector_(loop),
-    acceptor_(nullptr)
+    : main_reactor_(loop),
+    acceptor_(nullptr),
+    threadPool_(nullptr)
 {
-    acceptor_ = new Acceptor(mainRector_);
+    acceptor_ = new Acceptor(main_reactor_);
     std::function<void(Socket*)> cb = std::bind(&Server::NewConnection, this, std::placeholders::_1);
     acceptor_->setNewConnectionCallback(cb);
 
@@ -24,32 +26,45 @@ Server::Server(EventLoop* loop)
     threadPool_ = new ThreadPool(size);
     for (int i = 0; i < size; ++i)
     {
-        subReactors_.push_back(new EventLoop());
+        sub_reactor_.push_back(new EventLoop());
     }
 
     for (int i = 0; i < size; ++i)
     {
-        std::function<void()> sub_loop = std::bind(&EventLoop::Loop, subReactors_[i]);
+        std::function<void()> sub_loop = std::bind(&EventLoop::Loop, sub_reactor_[i]);
         threadPool_->Add(sub_loop);
     }
 }
 
 Server::~Server()
 {
+    for (EventLoop* each : sub_reactor_)
+    {
+        delete each;
+    }
+
     delete acceptor_;
     delete threadPool_;
 }
 
 void Server::NewConnection(Socket* sock)
 {
-    ErrorIf(sock->GetFd() == -1, "new connection error");
+    if (sock->GetFd() == -1)
+    {
+        throw Exception(ExceptionType::INVALID_SOCKET, "New Connection error, invalid cliet socket!");
+    }
 
-    int random = sock->GetFd() % subReactors_.size();
-    Connection* conn = new Connection(subReactors_[random], sock);
+    int random = sock->GetFd() % sub_reactor_.size();
+    Connection* conn = new Connection(sub_reactor_[random], sock);
     std::function<void(Socket*)> cb = std::bind(&Server::DeleteConnection, this, std::placeholders::_1);
     conn->SetDeleteConnectionCallback(cb);
-    conn->SetOnConnectCallback(on_connect_callback_);
+    conn->SetOnMessageCallback(on_connect_callback_);
     connections_[sock->GetFd()] = conn;
+    
+    if (new_connect_callback_)
+    {
+        new_connect_callback_(conn);
+    }
 }
 
 void Server::DeleteConnection(Socket* sock)
@@ -61,12 +76,22 @@ void Server::DeleteConnection(Socket* sock)
     {
         Connection* conn = connections_[sockfd];
         connections_.erase(sockfd);
-        // close(sockfd);       // 正常
-        delete conn;            // 会Segmant fault
+        delete conn;
+        conn = nullptr;
     }
 }
 
 void Server::OnConnect(std::function<void(Connection*)> fn)
 {
     on_connect_callback_ = std::move(fn);
+}
+
+void Server::OnMessage(std::function<void(Connection*)> fn)
+{
+    on_message_callback_ = std::move(fn);
+}
+
+void Server::NewConnect(std::function<void(Connection*)> fn)
+{
+    new_connect_callback_ = std::move(fn);
 }

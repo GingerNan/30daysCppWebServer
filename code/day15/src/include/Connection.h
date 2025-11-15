@@ -24,9 +24,12 @@ public:
 
     void Read();
     void Write();
+    void Send(std::string msg);
 
     void SetDeleteConnectionCallback(std::function<void(Socket*)> const& callback);
     void SetOnConnectCallback(std::function<void(Connection*)> const& callback);
+    void SetOnMessageCallback(std::function<void(Connection*)> const& callback);
+    void Business();
 
     State GetState() { return state_; }
     void Close();
@@ -52,11 +55,12 @@ private:
 
     State state_{State::Invalid};
 
-    Buffer* read_buffer_;
-    Buffer* send_buffer_;
+    Buffer* read_buffer_{nullptr};
+    Buffer* send_buffer_{nullptr};
 
     std::function<void(Socket*)> delete_connection_callback_;
     std::function<void(Connection*)> on_connect_callback_;
+    std::function<void(Connection*)> on_message_callback_;
 
     void ReadNonBlocking();
     void WriteNonBlocking();

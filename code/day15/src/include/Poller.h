@@ -11,15 +11,14 @@
 #endif
 
 class Channel;
-class Epoll
+
+class Poller
 {
 public:
-    Epoll();
-    ~Epoll();
+    Poller();
+    ~Poller();
 
-    DISALLOW_COPY_AND_MOVE(Epoll);
-
-    void AddFd(int fd, uint32_t op);
+    DISALLOW_COPY_AND_MOVE(Poller);
     
     void UpdateChannel(Channel* ch);
     void DeleteChannel(Channel* ch);
@@ -27,6 +26,12 @@ public:
     //std::vector<epoll_event> poll(int timeout = -1);
     std::vector<Channel*> Poll(int timeout = -1);
 private:
-    int epfd_{1};
-    struct epoll_event* events_{nullptr};
+    int fd_{1};
+    #ifdef OS_LINUX
+        struct epoll_event* events_{nullptr};
+    #endif
+    
+    #ifdef OS_MACOS
+        struct kevent* events_{nullptr};
+    #endif
 };
