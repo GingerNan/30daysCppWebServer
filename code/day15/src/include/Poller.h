@@ -6,6 +6,10 @@
     #include <sys/epoll.h>
 #endif
 
+#ifdef OS_MACOS
+    #include <sys/event.h>
+#endif
+
 class Channel;
 class Epoll
 {
