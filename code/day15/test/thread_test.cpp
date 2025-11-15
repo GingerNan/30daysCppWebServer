@@ -1,0 +1,24 @@
+#include <iostream>
+#include <string>
+#include "ThreadPool.h"
+
+void print(int a, double b, const char* c, std::string d)
+{
+    std::cout << a << b << c << d << std::endl;
+}
+
+void test()
+{
+    std::cout << "test" << std::endl;
+}
+
+int main(int argc, char const* argv[])
+{
+    ThreadPool* pool = new ThreadPool();
+    std::function<void()> func = std::bind(print, 1, 3.14, "hello", std::string("world"));
+    pool->Add(func);
+    func = test;
+    pool->Add(func);
+    delete pool;
+    return 0;
+}
