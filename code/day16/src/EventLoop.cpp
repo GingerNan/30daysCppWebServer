@@ -6,31 +6,22 @@
 
 EventLoop::EventLoop()
 {
-    poller_ = new Poller();
+    poller_ = std::make_unique<Poller>();
 }
 
 EventLoop::~EventLoop()
 {
-    Quit();
-    delete poller_;
 }
 
-void EventLoop::Loop()
+void EventLoop::Loop() const
 {
-    while (!quit_)
+    while (true)
     {
-        std::vector<Channel*> chs;
-        chs = poller_->Poll();
-        for (auto& ch : chs)
+        for (auto& active_ch : poller_->Poll())
         {
-            ch->HandleEvent();
+            active_ch->HandleEvent();
         }
     }   
-}
-
-void EventLoop::Quit()
-{
-    quit_ = true;
 }
 
 void EventLoop::UpdateChannel(Channel* ch)

@@ -1,15 +1,13 @@
 #pragma once
-#include "Macros.h"
+#include "common.h"
 #include <functional>
-
-class EventLoop;
-class Socket;
-class Channel;
-class Buffer;
+#include <memory>
 
 class Connection
 {
 public:
+    DISALLOW_COPY_AND_MOVE(Connection);
+
     enum State {
         Invalid = 1,
         Handshaking,
@@ -17,53 +15,44 @@ public:
         Closed,
         Failed,
     };
-
-    Connection(EventLoop* loop, Socket* sock);
+public:
+    Connection(int fd, EventLoop* loop);
     ~Connection();
-    DISALLOW_COPY_AND_MOVE(Connection);
 
-    void Read();
-    void Write();
-    void Send(std::string msg);
+    void SetDeleteConnectionCallback(std::function<void(int)> const& callback);
+    void SetOnConnect(std::function<void(Connection*)> const& callback);
+    void SetOnRecv(std::function<void(Connection*)> const& callback);
 
-    void SetDeleteConnectionCallback(std::function<void(Socket*)> const& callback);
-    void SetOnConnectCallback(std::function<void(Connection*)> const& callback);
-    void SetOnMessageCallback(std::function<void(Connection*)> const& callback);
-    void Business();
+    State GetState() const;
+    Socket* GetSocket() const;
 
-    State GetState() { return state_; }
-    void Close();
-
-    Buffer* GetReadBUffer();
-    const char* ReadBuffer();
-
+    Buffer* GetReadBuffer();
     void SetSendBuffer(const char* str);
     Buffer* GetSendBuffer();
-    const char* SendBuffer();
 
-    void GetlineSendBuffer();
+    RC Read();
+    RC Write();
+    RC Send(std::string msg);
 
-    Socket* GetSocket();
+    void Close();
 
     void OnConnect(std::function<void()> fn);
+    void OnMessage(std::function<void()> fn);
 private:
-    EventLoop* loop_;
-    
-    Socket* sock_;
-    
-    Channel* channel_{nullptr};
+    void Business();
 
-    State state_{State::Invalid};
+    RC ReadNonBlocking();
+    RC WriteNonBlocking();
+    RC ReadBlocking();
+    RC WriteBlocking();
+private:
+    std::unique_ptr<Socket> socket_;
+    std::unique_ptr<Channel> channel_;
 
-    Buffer* read_buffer_{nullptr};
-    Buffer* send_buffer_{nullptr};
+    State state_;
+    std::unique_ptr<Buffer> read_buf_;
+    std::unique_ptr<Buffer> send_buf_;
 
-    std::function<void(Socket*)> delete_connection_callback_;
-    std::function<void(Connection*)> on_connect_callback_;
-    std::function<void(Connection*)> on_message_callback_;
-
-    void ReadNonBlocking();
-    void WriteNonBlocking();
-    void ReadBlocking();
-    void WriteBlocking();
+    std::function<void(int)> delete_connection_;
+    std::function<void(Connection*)> on_recv_;
 };

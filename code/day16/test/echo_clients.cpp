@@ -10,9 +10,12 @@
 
 void OneClient(int msgs, int wait) {
     Socket *sock = new Socket();
+    sock->Create();
     sock->Connect("127.0.0.1", 8888);
-    Connection *conn = new Connection(nullptr, sock);
+    
+    Connection *conn = new Connection(sock->GetFd(), nullptr);
     sleep(wait);
+
     int count = 0;
     while (count < msgs)
     {
@@ -24,9 +27,10 @@ void OneClient(int msgs, int wait) {
             break;
         }
         conn->Read();
-        std::cout << "msg count " << count++ << ": " << conn->ReadBuffer() << std::endl;
+        std::cout << "msg count " << count++ << ": " << conn->GetReadBuffer()->c_str() << std::endl;
     }
     delete conn;
+    delete sock;
 }
 
 int main(int argc, char *argv[]) {

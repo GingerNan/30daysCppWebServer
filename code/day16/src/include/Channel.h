@@ -1,36 +1,31 @@
 #pragma once
-#include "Macros.h"
-
+#include "common.h"
 #include <functional>
-#include <cstdint>
-
-class Socket;
-class EventLoop;
 
 class Channel
 {
 public:
-    Channel(EventLoop* loop, Socket* socket);
+    DISALLOW_COPY_AND_MOVE(Channel);
+public:
+    Channel(int fd, EventLoop* loop);
     ~Channel();
 
-    DISALLOW_COPY_AND_MOVE(Channel);
-
-    void HandleEvent();
+    void HandleEvent() const;
 
     void EnbleWrite();
     void EnbleRead();
 
-    Socket* GetSocket();
+    int GetFd() const;
 
-    uint32_t GetListenEvents();
-    uint32_t GetReadyEvents();
+    short GetListenEvents() const;
+    short GetReadyEvents() const;
 
     bool GetExist();
     void SetExist(bool in = true);
 
-    void UseET();
+    void EnbleET();
 
-    void SetReadyEvents(uint32_t);
+    void SetReadyEvents(short ev);
     void SetReadCallback(std::function<void()> const& callback);
     void SetWriteCallback(std::function<void()> const& callback);
 
@@ -38,13 +33,13 @@ public:
     static const int WRITE_EVENT;
     static const int ET;
 private:
+    int fd_;
     EventLoop* loop_;
-    Socket* socket_;
 
-    uint32_t listen_events_{0};
-    uint32_t ready_events_{0};
+    short listen_events_;
+    short ready_events_;
 
-    bool exist_{false};
+    bool exist_;
 
     std::function<void()> read_callback_;
     std::function<void()> write_callback_;

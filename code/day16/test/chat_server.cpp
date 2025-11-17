@@ -2,12 +2,13 @@
 #include <map>
 #include "Connection.h"
 #include "EventLoop.h"
-#include "Server.h"
+#include "TcpServer.h"
 #include "Socket.h"
 
 
 int main()
 {
+    /*
     std::map<int, Connection*> clients;
 
     EventLoop* loop = new EventLoop();
@@ -35,5 +36,6 @@ int main()
     });
 
     loop->Loop();
+    */
     return 0;
 }

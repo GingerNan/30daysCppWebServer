@@ -23,7 +23,7 @@ private:
     std::queue<std::function<void()>> tasks_;
     std::mutex tasks_mtx_;
     std::condition_variable cv_;
-    bool stop_;
+    std::atomic_bool stop_;
 };
 
 // 不能放在cpp文件，原因是C++编译器不支持模板的分离编译

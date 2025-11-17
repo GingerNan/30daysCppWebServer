@@ -4,6 +4,7 @@
 
 int main()
 {
+    /*
     Socket* sock = new Socket();
     sock->Connect("127.0.0.1", 8888);
 
@@ -23,7 +24,7 @@ int main()
     //conn->SetSendBuffer("Hello server!");
     //conn->Write();
 
-
     delete conn;
+    */
     return 0;
 }

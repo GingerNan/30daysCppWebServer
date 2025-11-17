@@ -1,25 +1,19 @@
 #pragma once
-#include "Macros.h"
-#include <functional>
-
-class Poller;
-class Channel;
-class ThreadPool;
+#include "common.h"
+#include <memory>
 
 class EventLoop
 {
 public:
+    DISALLOW_COPY_AND_MOVE(EventLoop);
+public:
     EventLoop();
     ~EventLoop();
 
-    DISALLOW_COPY_AND_MOVE(EventLoop);
-
-    void Loop();
+    void Loop() const;
     
     void UpdateChannel(Channel* ch);
     void DeleteChannel(Channel* ch);
-    void Quit();
 private:
-    Poller* poller_{nullptr};
-    bool quit_{false};
+    std::unique_ptr<Poller> poller_;
 };

@@ -12,12 +12,12 @@ void Buffer::Append(const char* str, int size)
     }
 }
 
-ssize_t Buffer::Size()
+size_t Buffer::Size() const
 {
     return buf_.size();
 }
 
-const char* Buffer::ToStr()
+const char* Buffer::c_str() const
 {
     return buf_.c_str();
 }
@@ -26,15 +26,14 @@ void Buffer::Clear()
 {
     buf_.clear();
 }
- 
-void Buffer::Getline()
-{
-    buf_.clear();
-    std::getline(std::cin, buf_);
-}
 
 void Buffer::SetBuf(const char* buf)
 {
     buf_.clear();
     buf_.append(buf);
+}
+
+const std::string& Buffer::buf() const
+{
+    return buf_;
 }

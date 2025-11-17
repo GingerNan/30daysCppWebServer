@@ -9,9 +9,12 @@ const int Channel::READ_EVENT = 1;
 const int Channel::WRITE_EVENT = 2;
 const int Channel::ET = 4;
 
-Channel::Channel(EventLoop* loop, Socket* socket)
+Channel::Channel(int fd, EventLoop* loop)
     : loop_(loop),
-    socket_(socket)
+    fd_ (fd),
+    listen_events_(0),
+    ready_events_(0),
+    exist_(false)
 {
 }
 
@@ -20,7 +23,7 @@ Channel::~Channel()
     loop_->DeleteChannel(this);
 }
 
-void Channel::HandleEvent()
+void Channel::HandleEvent() const
 {
     if (ready_events_& READ_EVENT)
     {
@@ -45,23 +48,24 @@ void Channel::EnbleWrite()
     loop_->UpdateChannel(this);
 }
 
-void Channel::UseET()
+void Channel::EnbleET()
 {
     listen_events_ |= ET;
     loop_->UpdateChannel(this);
 }
 
-Socket* Channel::GetSocket()
+int Channel::GetFd() const
 {
-    return socket_;
+    return fd_;
 }
 
-uint32_t Channel::GetListenEvents()
+
+short Channel::GetListenEvents() const
 {
     return listen_events_;
 }
 
-uint32_t Channel::GetReadyEvents()
+short Channel::GetReadyEvents() const
 {
     return ready_events_;
 }
@@ -76,7 +80,7 @@ void Channel::SetExist(bool in)
     exist_ = in;
 }
 
-void Channel::SetReadyEvents(uint32_t ev)
+void Channel::SetReadyEvents(short ev)
 {
     if (ev & READ_EVENT)
     {
