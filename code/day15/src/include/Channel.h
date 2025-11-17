@@ -2,6 +2,7 @@
 #include "Macros.h"
 
 #include <functional>
+#include <cstdint>
 
 class Socket;
 class EventLoop;

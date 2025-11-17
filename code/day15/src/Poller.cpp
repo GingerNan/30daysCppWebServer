@@ -12,16 +12,16 @@
 Poller::Poller()
 {
     fd_ = epoll_create1(0);
-    ErrorIf(epfd_ == -1, "epoll create error");
+    ErrorIf(fd_ == -1, "epoll create error");
     events_ = new epoll_event[MAX_EVENTS];
     bzero(events_, sizeof(*events_) * MAX_EVENTS);
 }
 
 Poller::~Poller()
 {
-    if (epfd_ != -1)
+    if (fd_ != -1)
     {
-        close(epfd_);
+        close(fd_);
     }
     delete[] events_;
 }
