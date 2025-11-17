@@ -18,7 +18,7 @@ Acceptor::Acceptor(EventLoop* loop)
         对于Acceptor，接受连接的处理事件比较短、报文数据极小，并且一般不会有特别多的新连接在同一
     时间到达，所有Accept没有必要采用epoll ET模式，也没有必要用线程池。由于不会成为性能瓶颈。
     */
-    //m_sock->setnonblocking(); acceptor使用阻塞式IO比较好
+    //sock_->setnonblocking(); acceptor使用阻塞式IO比较好
 
     acceptChannel_ = new Channel(loop_, sock_);
     std::function<void()> cb = std::bind(&Acceptor::acceptConnection, this);

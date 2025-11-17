@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/bin/echo_client",
+            "program": "${workspaceFolder}/build/bin/echo_server",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

@@ -228,7 +228,7 @@ void Connection::ReadBlocking()
     }
     else if (bytes_read == -1)
     {
-        printf("Other error on blocking client fd %d\n", sockfd);
+        printf("[ReadBlocking] Other error on blocking client fd %d\n", sockfd);
         state_ = State::Closed;
     }
 }
@@ -243,7 +243,7 @@ void Connection::WriteBlocking()
     ssize_t bytes_write = ::write(sockfd, send_buffer_->ToStr(), send_buffer_->Size());
     if (bytes_write == -1)
     {
-        printf("Other error on blocking client fd %d\n", sockfd);
+        printf("[WriteBlocking]Other error on blocking client fd %d\n", sockfd);
         state_ = State::Closed;
     }
 }

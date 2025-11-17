@@ -39,6 +39,8 @@ public:
             return "Invalid";
         case ExceptionType::INVALID_SOCKET:
             return "Invalid socket";
+        default:
+            return "";
         }
     }
 private:

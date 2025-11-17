@@ -86,7 +86,7 @@ void Socket::Setnonblocking()
 
 bool Socket::IsNonBlocking()
 {
-    return fcntl(fd_, F_SETFL, fcntl(fd_, F_GETFL) | O_NONBLOCK);
+    return (fcntl(fd_, F_GETFL) & O_NONBLOCK) != 0;
 }
 
 int Socket::Accept(InetAddress* addr)

@@ -58,7 +58,8 @@ void Server::NewConnection(Socket* sock)
     Connection* conn = new Connection(sub_reactor_[random], sock);
     std::function<void(Socket*)> cb = std::bind(&Server::DeleteConnection, this, std::placeholders::_1);
     conn->SetDeleteConnectionCallback(cb);
-    conn->SetOnMessageCallback(on_connect_callback_);
+    //conn->SetOnMessageCallback(on_connect_callback_);
+    conn->SetOnMessageCallback(on_message_callback_);
     connections_[sock->GetFd()] = conn;
     
     if (new_connect_callback_)
