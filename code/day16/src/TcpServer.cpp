@@ -3,6 +3,7 @@
 #include "Acceptor.h"
 #include "Connection.h"
 #include "ThreadPool.h"
+#include <iostream>
 
 TcpServer::TcpServer()
 {
@@ -22,7 +23,7 @@ TcpServer::TcpServer()
 
     for (int i = 0; i < size; ++i)
     {
-        std::function<void()> sub_loop = std::bind(&EventLoop::Loop, sub_reactor_[i]);
+        std::function<void()> sub_loop = std::bind(&EventLoop::Loop, sub_reactor_[i].get());
         threadPool_->Add(sub_loop);
     }
 }
@@ -43,7 +44,7 @@ void TcpServer::Start()
 
 RC TcpServer::NewConnection(int fd)
 {
-    assert(fd == -1);
+    assert(fd != -1);
     uint64_t random = fd % sub_reactor_.size();
 
     std::unique_ptr<Connection> conn = std::make_unique<Connection>(fd, sub_reactor_[random].get());
@@ -62,6 +63,7 @@ RC TcpServer::NewConnection(int fd)
 
 RC TcpServer::DeleteConnection(int fd)
 {
+    std::cout << "[DeleteConnection] fd=" << fd << std::endl;
     auto it = connections_.find(fd);
     assert(it != connections_.end());
     connections_.erase(fd);

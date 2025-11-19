@@ -4,10 +4,12 @@
 
 #include <fcntl.h>
 #include <utility>
+#include <iostream>
     
 Acceptor::Acceptor(EventLoop* loop)
 {
     socket_ = std::make_unique<Socket>();
+    assert(socket_->Create() == RC_SUCCESS);
     assert(socket_->Bind("127.0.0.1", 8888) == RC_SUCCESS);
     assert(socket_->Listen() == RC_SUCCESS);
 
@@ -29,7 +31,6 @@ RC Acceptor::AcceptConnection() const
         return RC_ACCEPTOR_ERROR;
     }
 
-    // TODO: remove
     fcntl(client_fd, F_SETFL, fcntl(client_fd, F_GETFL) | O_NONBLOCK); //新接收的连接设置为非阻塞
     if (new_connection_callback_)
     {

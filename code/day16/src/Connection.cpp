@@ -154,7 +154,7 @@ RC Connection::ReadBlocking()
     // socklen_t len = sizeof rcv_size;
     // getsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, &rcv_size, &len);
 
-    size_t data_size = socket_->RecvBufSize();
+    //size_t data_size = socket_->RecvBufSize();
     char buf[1024];
     ssize_t bytes_read = ::read(sockfd, buf, sizeof buf);
     if (bytes_read > 0)
@@ -227,4 +227,10 @@ Buffer* Connection::GetReadBuffer()
 Buffer* Connection::GetSendBuffer()
 {
     return send_buf_.get();
+}
+
+void Connection::Business()
+{
+    Read();
+    on_recv_(this);
 }

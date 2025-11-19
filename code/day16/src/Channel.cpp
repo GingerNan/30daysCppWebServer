@@ -10,8 +10,8 @@ const int Channel::WRITE_EVENT = 2;
 const int Channel::ET = 4;
 
 Channel::Channel(int fd, EventLoop* loop)
-    : loop_(loop),
-    fd_ (fd),
+    : fd_ (fd),
+    loop_(loop),
     listen_events_(0),
     ready_events_(0),
     exist_(false)

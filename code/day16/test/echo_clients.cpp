@@ -7,6 +7,7 @@
 #include "Connection.h"
 #include "Socket.h"
 #include "ThreadPool.h"
+#include "Buffer.h"
 
 void OneClient(int msgs, int wait) {
     Socket *sock = new Socket();

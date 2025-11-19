@@ -17,6 +17,10 @@ int main()
     });
 
     server->OnRecv([](Connection* conn){
+        if (!conn->GetSendBuffer())
+        {
+            std::cout << "[OnRecv]"
+        }
         std::cout << "Message from client " << conn->GetReadBuffer()->c_str() << std::endl;
         if (conn->GetState() == Connection::State::Connected)
         {
